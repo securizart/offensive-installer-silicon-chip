@@ -4,6 +4,11 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 Todas las fechas en AAAA-MM-DD.
 
 ## [Unreleased]
+### Added
+- `README.en.md` y `CONTRIBUTING.en.md`: versión en inglés de los dos
+  ficheros de nivel raíz (antes solo estaban en castellano, a pesar de
+  que `docs/` ya era bilingüe). Enlaces cruzados entre idiomas añadidos
+  en `README.md` y `CONTRIBUTING.md`.
 
 ## [0.3.0] — soporte multi-SO (Parrot OS)
 ### Added

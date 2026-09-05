@@ -1,5 +1,7 @@
 # Offensive Installer Silicon Chip (base_inst_kali)
 
+**[Read this in English → README.en.md](README.en.md)**
+
 Instalador con menú, multiidioma (ES/EN) y soporte para **varios
 sistemas operativos ofensivos** (Kali Linux, Parrot Security OS) en un
 disco externo USB con particiones cifradas, clonados a partir de una
@@ -93,7 +95,8 @@ de varios sistemas operativos, resolución de problemas):
 | Resolución de problemas | [docs/es/TROUBLESHOOTING.md](docs/es/TROUBLESHOOTING.md) | [docs/en/TROUBLESHOOTING.md](docs/en/TROUBLESHOOTING.md) |
 
 Otros ficheros del repositorio: [CHANGELOG.md](CHANGELOG.md) ·
-[CONTRIBUTING.md](CONTRIBUTING.md) · [LICENSE](LICENSE)
+[CONTRIBUTING.md](CONTRIBUTING.md) ([English](CONTRIBUTING.en.md)) ·
+[LICENSE](LICENSE)
 
 ## Estructura del repositorio
 

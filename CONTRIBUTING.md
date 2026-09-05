@@ -1,5 +1,7 @@
 # Contribuir a base_inst_kali (Offensive Installer Silicon Chip)
 
+**[Read this in English → CONTRIBUTING.en.md](CONTRIBUTING.en.md)**
+
 Gracias por el interés en mejorar este proyecto. Antes de nada, lee
 [docs/es/ARQUITECTURA.md](docs/es/ARQUITECTURA.md) (o
 [docs/en/ARCHITECTURE.md](docs/en/ARCHITECTURE.md)) para entender el

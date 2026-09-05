@@ -1,24 +1,30 @@
-# base_inst_kali
+# Offensive Installer Silicon Chip (base_inst_kali)
 
 Instalador con menú, multiidioma (ES/EN) y soporte para **varios
-sistemas operativos ofensivos** (Kali Linux, Parrot OS) en un disco
-externo USB, clonados a partir de una base **Debian/Asahi** ya instalada
-en un MacBook Air Apple Silicon (M1/M2).
+sistemas operativos ofensivos** (Kali Linux, Parrot Security OS) en un
+disco externo USB con particiones cifradas, clonados a partir de una
+base **Debian/Asahi** ya instalada en un MacBook Air/Pro Apple Silicon
+(M1/M2). El `/boot` (EFI + kernel) se mantiene en el disco interno del
+Mac; el sistema de ficheros raíz vive en el disco externo.
 
 ```
 Debian/Asahi (NVMe interno, ya instalado) ──clona──▶ disco externo USB
                                                        ├── Kali Linux (particiones propias)
-                                                       └── Parrot OS  (particiones propias)
+                                                       └── Parrot Security OS (particiones propias)
 ```
+
+> ⚠️ **Estado del proyecto:** en desarrollo activo. Los scripts son
+> funcionales pero no están pensados para un uso "a ciegas". Lee la
+> sección de riesgos antes de ejecutar nada.
 
 ## Requisito indispensable antes de usar esto
 
-**El MacBook Air debe tener ya instalado y actualizado el sistema
-operativo base Asahi Linux / Debian** en su disco interno (NVMe), antes
-de ejecutar nada de este repositorio. Este proyecto **no instala macOS
-ni Asahi/Debian**: parte de que esa base ya existe y funciona, y clona
-ese sistema en marcha hacia un disco externo para convertirlo en Kali
-y/o Parrot.
+**El MacBook debe tener ya instalado y actualizado el sistema operativo
+base Asahi Linux / Debian** en su disco interno (NVMe), antes de
+ejecutar nada de este repositorio. Este proyecto **no instala macOS ni
+Asahi/Debian**: parte de que esa base ya existe y funciona, y clona ese
+sistema en marcha hacia un disco externo para convertirlo en Kali y/o
+Parrot.
 
 Sigue la guía oficial si todavía no la tienes:
 <https://wiki.debian.org/InstallingDebianOn/Apple/M1> (proyecto Bananas
@@ -30,12 +36,16 @@ este repositorio.
 
 ## Qué hace este proyecto
 
-- Particiona, cifra (LUKS) y formatea un **disco externo USB**.
+Automatiza y encadena un flujo que hoy exige combinar varias guías
+sueltas y bastante prueba-error manual:
+
+- Comprueba los prerrequisitos y particiona, cifra (LUKS) y formatea un
+  **disco externo USB**.
 - **Clona** el sistema Debian/Asahi en marcha a ese disco externo.
 - Añade los repositorios y metapaquetes de **Kali Linux** y/o **Parrot
-  OS** sobre esa base clonada, convirtiéndola en una distribución de
-  pentesting completa, arrancable desde el menú de GRUB junto al sistema
-  original.
+  Security OS** sobre esa base clonada, usando los mecanismos oficiales
+  de cada distribución, convirtiéndola en una distribución de pentesting
+  completa arrancable desde el menú de GRUB junto al sistema original.
 - Permite instalar **más de un sistema ofensivo en el mismo disco
   externo**, cada uno en sus propias particiones, sin pisar los datos de
   los demás.
@@ -43,11 +53,32 @@ este repositorio.
   persistente (sobrevive a los múltiples reinicios que exige el
   proceso), **logging** por paso, y textos en **castellano e inglés**.
 
+## Requisitos
+
+- MacBook con chip Apple M1 o M2, con Asahi Linux/Debian ya instalado y
+  actualizado (ver arriba).
+- Disco duro/SSD externo con espacio suficiente (se recomiendan 60 GB o
+  más por cada sistema operativo que instales).
+- Conexión a internet estable durante todo el proceso.
+- Copia de seguridad completa de tus datos antes de empezar (ver Riesgos).
+- Conocimientos básicos de línea de comandos y particionado de discos.
+
+## ⚠️ Riesgos y advertencias
+
+- Este proceso modifica el particionado y el firmware de arranque del
+  disco externo, y añade entradas al `grub.cfg` del sistema interno. Un
+  fallo durante estos pasos puede impedir temporal o permanentemente que
+  el sistema arranque correctamente.
+- Todavía no hay un desinstalador automático. Revertir los cambios exige
+  edición manual de particiones.
+- Usa este proyecto bajo tu propia responsabilidad. Recomendado solo en
+  máquinas de prueba o con una copia de seguridad completa y verificada.
+
 ## Empezar
 
 ```bash
-git clone <url-de-este-repositorio> base_inst_kali
-cd base_inst_kali
+git clone https://github.com/securizart/offensive-installer-silicon-chip.git
+cd offensive-installer-silicon-chip
 sudo bash install.sh
 ```
 
@@ -111,15 +142,61 @@ en resumen: añadir su id a `lib/os_catalog.sh`, sus textos a
 resto del framework (menú, particionado, clonado, GRUB) es genérico y no
 hay que tocarlo.
 
-## Aviso legal / uso responsable
+## Compatibilidad probada
 
-Este proyecto instala herramientas de pentesting (Kali Linux, Parrot
-OS). Su uso está pensado para pruebas de seguridad autorizadas, análisis
-forense y aprendizaje en entornos propios o con permiso explícito. El
-uso de estas herramientas contra sistemas de terceros sin autorización
-puede ser ilegal según la jurisdicción; la responsabilidad de un uso
-correcto es de quien opera el sistema.
+| Modelo | Estado |
+|---|---|
+| MacBook Air M1 | Por probar |
+| MacBook Air M2 | Por probar |
+| MacBook Pro M1 | Por probar |
+| MacBook Pro M2 | Por probar |
+
+Actualiza esta tabla según se vaya confirmando en los `Issues` del
+repositorio.
+
+## Trabajo previo / Créditos
+
+Este proyecto no parte de cero: se apoya en y da crédito a trabajo
+previo de la comunidad, entre otros:
+
+- [AsahiLinux/asahi-installer](https://github.com/AsahiLinux/asahi-installer) —
+  el instalador base de Linux para Apple Silicon.
+- [kali-asahi](https://github.com/allamiro/kali-asahi) — imagen nativa
+  de Kali para Apple Silicon.
+- Documentación oficial de Kali sobre
+  [repositorios APT](https://www.kali.org/docs/general-use/kali-apt-sources/)
+  y metapaquetes (`kali-linux-headless`, `kali-linux-everything`).
+- [Debian Conversion Script de ParrotSec](https://gitlab.com/parrotsec/project/debian-conversion-script) —
+  el script oficial del equipo de Parrot para convertir una base Debian.
+- La guía de [Void Linux en Apple Silicon](https://docs.voidlinux.org/installation/guides/arm-devices/apple-silicon.html),
+  usada como referencia para el patrón de partición externa con
+  `/boot/efi` interno.
+- La guía de Debian para Apple Silicon
+  (<https://wiki.debian.org/InstallingDebianOn/Apple/M1>, proyecto
+  Bananas), como referencia del prerrequisito de base Asahi/Debian.
+
+**Lo que este proyecto añade sobre lo anterior:** integra y automatiza en
+un único flujo repetible, con menú, progreso persistente, logging e
+idioma configurable, pasos que antes estaban dispersos en guías
+independientes — y permite instalar **varios sistemas ofensivos a la
+vez** en el mismo disco externo, sin colisionar entre ellos.
+
+## Aviso legal y uso ético
+
+Este proyecto instala herramientas orientadas a pentesting y seguridad
+ofensiva (Kali Linux, Parrot Security OS). Su uso está permitido
+**únicamente** en sistemas de tu propiedad o para los que tengas
+autorización explícita del propietario. El uso de estas herramientas
+contra sistemas de terceros sin autorización puede ser ilegal según la
+jurisdicción; el autor no se hace responsable del mal uso de las
+herramientas instaladas a través de este proyecto.
 
 ## Licencia
 
-Ver [LICENSE](LICENSE).
+Distribuido bajo licencia GPLv3. Ver el fichero [LICENSE](LICENSE).
+
+## Contribuir
+
+Las contribuciones son bienvenidas. Abre un Issue para reportar
+problemas o una Pull Request para mejoras. Ver
+[CONTRIBUTING.md](CONTRIBUTING.md).

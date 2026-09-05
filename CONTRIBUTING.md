@@ -1,4 +1,4 @@
-# Contribuir a base_inst_kali
+# Contribuir a base_inst_kali (Offensive Installer Silicon Chip)
 
 Gracias por el interés en mejorar este proyecto. Antes de nada, lee
 [docs/es/ARQUITECTURA.md](docs/es/ARQUITECTURA.md) (o
@@ -7,10 +7,35 @@ diseño: pasos "de host" vs "por sistema operativo", los tres entornos de
 ejecución (host / chroot / sistema clonado ya arrancado), y por qué el
 estado se sincroniza a mano entre ellos.
 
-## Cómo probar cambios sin hardware real
+## Reportar un problema
 
-La mayoría de la lógica (menú, estado, i18n, cálculo de particiones) se
-puede probar sin tocar discos reales:
+Abre un [Issue](../../issues) incluyendo:
+
+- Modelo exacto de Mac (Air/Pro, M1/M2) y cantidad de RAM.
+- Versión de macOS desde la que partiste antes de instalar Asahi/Debian.
+- Distribución elegida (Kali o Parrot) y en qué paso (`00`…`09`) falló el
+  proceso.
+- Salida completa del error, junto con el log del paso concreto
+  (`logs/paso_<id>_<fecha>.log`), con cualquier dato sensible (SSID,
+  contraseñas, UUID si te preocupa) eliminado a mano. Usa bloques de
+  código (```` ``` ````) para pegarlo.
+
+## Proponer una mejora
+
+1. Haz un fork del repositorio.
+2. Crea una rama descriptiva: `git checkout -b fix/particionado-externo`.
+3. **Prueba tu cambio en una máquina real antes de abrir el PR.** Dado el
+   riesgo que implican estos scripts (particionado, cifrado, GRUB), no se
+   aceptarán cambios sin evidencia de haberse probado — al menos en un
+   modelo de Mac concreto, indicando cuál.
+4. Abre el Pull Request describiendo qué problema resuelve y en qué
+   modelo de Mac lo probaste. Indica también si afecta a Kali, a Parrot,
+   o a ambos.
+
+## Cómo probar cambios sin hardware real (solo para lógica, no para pasos destructivos)
+
+La lógica de menú, estado, i18n y cálculo de particiones se puede probar
+sin tocar discos reales:
 
 ```bash
 # Comprobar sintaxis de todo el proyecto
@@ -21,27 +46,30 @@ rm -f /var/lib/base_inst_kali/state.conf   # estado limpio
 printf '\n' | bash install.sh              # navega con números + Enter
 ```
 
-Los pasos que sí tocan disco (`02_particiones.sh` en adelante) requieren
-un disco real o una máquina virtual con un disco de pruebas — **nunca**
-los pruebes contra el disco donde vive tu sistema operativo principal.
+Esto **no sustituye** la prueba en hardware real exigida en el punto 3
+de arriba para cualquier cambio que toque los pasos `02` en adelante
+(particionado, LUKS, clonado, GRUB, repositorios): esos solo se
+consideran probados si se han ejecutado de verdad en un Mac Apple
+Silicon con un disco externo.
 
-## Convenciones de código
+## Estilo de los scripts
 
-Todas viven también en `docs/*/ARQUITECTURA.md` / `ARCHITECTURE.md`;
-resumen:
-
-1. Cualquier operación irreversible sobre un disco pasa por
-   `confirm_destructive` (obliga a teclear una palabra de confirmación
-   completa, no un simple s/n).
-2. Ningún dato sensible se guarda fuera de los ficheros de configuración
-   del propio sistema, y esos ficheros quedan con permisos `600`.
-3. Todo comando que pueda fallar va envuelto en
-   `run_cmd "descripción" comando...` para quedar registrado en el log.
-4. Con `pipefail` activo, un `grep`/`awk` sin coincidencias hace fallar
-   la línea bajo `set -e`; añade `|| true` cuando "vacío" sea un
-   resultado válido y compruébalo explícitamente después.
-5. Cualquier nombre derivado del sistema operativo (partición, VG,
-   mapper, mountpoint) sale de `lib/os_catalog.sh`, nunca hardcodeado.
+- Bash con `set -euo pipefail` al principio de cada script (heredado
+  automáticamente al cargar `lib/common.sh`).
+- Comentarios que expliquen el *por qué*, no solo el *qué* — especialmente
+  en las partes no obvias (por ejemplo, por qué el paso 06 no bloquea el
+  menú del host, o por qué se namespacea el estado por sistema
+  operativo; ver `docs/es/ARQUITECTURA.md`).
+- Cualquier paso destructivo (particionar, formatear, borrar) debe pedir
+  confirmación explícita del usuario antes de ejecutarse
+  (`confirm_destructive` en `lib/common.sh`).
+- Todo comando que pueda fallar va envuelto en
+  `run_cmd "descripción" comando...` para quedar registrado en el log.
+- Con `pipefail` activo, un `grep`/`awk` sin coincidencias hace fallar
+  la línea bajo `set -e`; añade `|| true` cuando "vacío" sea un
+  resultado válido y compruébalo explícitamente después.
+- Cualquier nombre derivado del sistema operativo (partición, VG,
+  mapper, mountpoint) sale de `lib/os_catalog.sh`, nunca hardcodeado.
 
 ## Añadir un sistema operativo nuevo
 
@@ -67,16 +95,6 @@ código en el selector de idioma de `install.sh`
 - Si el cambio afecta al comportamiento documentado, actualiza también
   la documentación correspondiente en **ambos** idiomas (`docs/es/` y
   `docs/en/`).
-- Describe cómo lo has probado (aunque sea solo `bash -n` + navegación
-  del menú, si no tenías hardware real a mano).
-
-## Reportar problemas
-
-Al abrir un issue, incluye:
-- El paso concreto donde ocurre (`00`…`09`) y su log
-  (`logs/paso_<id>_<fecha>.log`), con cualquier dato sensible (SSID,
-  contraseñas, UUID si te preocupa) eliminado a mano.
-- Si el problema aparece con un sistema operativo concreto (Kali,
-  Parrot), indícalo.
-- Salida de `uname -m` y de `dpkg -l | grep asahi-` si el problema
-  parece relacionado con el paso 00.
+- Describe cómo lo has probado: en qué modelo de Mac (obligatorio para
+  cambios en los pasos `02`-`09`), o solo `bash -n` + navegación del
+  menú si el cambio no toca lógica destructiva.

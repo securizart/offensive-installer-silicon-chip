@@ -2,7 +2,7 @@
 
 An installer that automates the deployment of an offensive security
 distribution (**Kali Linux** or **Parrot Security OS**) on Apple Silicon
-MacBooks (M1/M2), using an **external hard drive** to host the root
+MacBooks (M1/M2), using an **external hard drive with crypt partitions** to host the root
 filesystem, while the `/boot` partition (EFI + kernel) stays on the Mac's
 internal disk.
 

@@ -9,6 +9,26 @@ Todas las fechas en AAAA-MM-DD.
   ficheros de nivel raíz (antes solo estaban en castellano, a pesar de
   que `docs/` ya era bilingüe). Enlaces cruzados entre idiomas añadidos
   en `README.md` y `CONTRIBUTING.md`.
+- Documentado el workaround de firmware/u-boot cuando no detecta el
+  disco externo al arrancar (`env set boot_efi_mgr` + `run
+  bootcmd_usb0`), en `docs/{es,en}/TROUBLESHOOTING.md`, con referencia
+  cruzada desde la guía de uso.
+- Tabla de compatibilidad actualizada: MacBook Air M1 y M2 confirmados
+  como probados (Kali y Parrot), en ambos README.
+- Sección "Demo en vídeo" completada con el enlace real
+  (<https://youtu.be/JsPsCAa4XBU>) y miniatura clicable en ambos README.
+- Sección "Hoja de ruta" añadida a ambos README y nota correspondiente
+  en `docs/{es,en}/SISTEMAS_OPERATIVOS.md`/`OPERATING_SYSTEMS.md`:
+  Ubuntu como tercer sistema operativo planeado (segunda versión del
+  instalador), con el objetivo de mejorar la integración de Parrot OS.
+  Todavía no implementado.
+- Advertencias reforzadas en ambos README y en la guía de uso
+  (`GUIA_USO.md`/`USAGE.md`): se exige conocimiento profundo de
+  administración de sistemas Linux (no apto para principiantes), se
+  insta a comprobar la compatibilidad de versión entre la base
+  Debian/Asahi y la distro elegida (Kali/Parrot) antes de los pasos
+  08-09, y se recomienda hacer tantas copias de seguridad del macOS
+  como sean necesarias, verificadas antes de empezar.
 
 ## [0.3.0] — soporte multi-SO (Parrot OS)
 ### Added

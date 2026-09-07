@@ -63,7 +63,12 @@ sueltas y bastante prueba-error manual:
   más por cada sistema operativo que instales).
 - Conexión a internet estable durante todo el proceso.
 - Copia de seguridad completa de tus datos antes de empezar (ver Riesgos).
-- Conocimientos básicos de línea de comandos y particionado de discos.
+- **Conocimientos profundos de administración y operación de sistemas
+  Linux** (particionado, LVM, LUKS, chroot, GRUB, gestión de paquetes
+  APT). Este NO es un instalador pensado para quien se inicia en Linux:
+  cualquier paso mal entendido puede dejar el Mac sin arrancar. Si algún
+  término de los anteriores no te resulta familiar, fórmate primero
+  antes de tocar el disco interno o el externo.
 
 ## ⚠️ Riesgos y advertencias
 
@@ -71,6 +76,23 @@ sueltas y bastante prueba-error manual:
   disco externo, y añade entradas al `grub.cfg` del sistema interno. Un
   fallo durante estos pasos puede impedir temporal o permanentemente que
   el sistema arranque correctamente.
+- **Haz tantas copias de seguridad de tu macOS como sean necesarias**
+  antes de empezar (Time Machine y, si es posible, un clon completo del
+  disco con una herramienta como Carbon Copy Cloner o SuperDuper). No se
+  trata de "una copia por si acaso": repite las copias en distintos
+  destinos si el equipo contiene datos que no puedes permitirte perder,
+  y verifica que son restaurables antes de empezar, no después.
+- **Comprueba tú mismo que la versión de la base Debian/Asahi que tienes
+  instalada es compatible con la versión de Kali Linux o Parrot OS que
+  vayas a instalar.** Este instalador añade los repositorios de Kali
+  (`kali-rolling`) o de Parrot (`lts`) sobre la base Debian que ya
+  tengas; si esa base es demasiado antigua, demasiado nueva, o no
+  corresponde a la que cada distribución espera como origen, el
+  `dist-upgrade` de los pasos 08-09 puede dejar el sistema en un estado
+  roto o a medio actualizar. Revisa la documentación oficial de Kali y
+  de Parrot sobre requisitos de la base antes de lanzar esos pasos, y no
+  asumas que "la última versión de Debian disponible" es automáticamente
+  la correcta.
 - Todavía no hay un desinstalador automático. Revertir los cambios exige
   edición manual de particiones.
 - Usa este proyecto bajo tu propia responsabilidad. Recomendado solo en
@@ -149,13 +171,40 @@ hay que tocarlo.
 
 | Modelo | Estado |
 |---|---|
-| MacBook Air M1 | Por probar |
-| MacBook Air M2 | Por probar |
+| MacBook Air M1 | ✅ Probado (Kali y Parrot) |
+| MacBook Air M2 | ✅ Probado (Kali y Parrot) |
 | MacBook Pro M1 | Por probar |
 | MacBook Pro M2 | Por probar |
 
 Actualiza esta tabla según se vaya confirmando en los `Issues` del
 repositorio.
+
+> Si el firmware/u-boot no detecta el disco externo al arrancar, ver
+> ["El firmware no detecta el disco externo al arrancar"](docs/es/TROUBLESHOOTING.md#el-firmware-no-detecta-el-disco-externo-al-arrancar)
+> en la guía de resolución de problemas.
+
+## Demo en vídeo
+
+## Demo en vídeo
+
+[![Demo: instalación de Kali, Parrot y Ubuntu sobre Debian/Asahi en Apple Silicon](https://img.youtube.com/vi/JsPsCAa4XBU/hqdefault.jpg)](https://youtu.be/JsPsCAa4XBU)
+
+▶️ **[Ver en YouTube](https://youtu.be/JsPsCAa4XBU)**
+
+En el vídeo también se puede comprobar la instalación y el uso de
+**Ubuntu** sobre esta misma base, a modo de prueba de concepto — ver la
+hoja de ruta más abajo.
+
+## Hoja de ruta
+
+- **Ubuntu como tercer sistema operativo instalable**: se está
+  preparando una segunda versión del instalador que añada Ubuntu al
+  catálogo (`lib/os_catalog.sh`), siguiendo el mismo patrón que Kali y
+  Parrot. El objetivo, además de ofrecerlo como opción propia, es usarlo
+  para **mejorar la integración de Parrot OS**, cuyo soporte arm64 es
+  oficial pero menos maduro que el de Kali (ver
+  [docs/es/SISTEMAS_OPERATIVOS.md](docs/es/SISTEMAS_OPERATIVOS.md)).
+  Todavía no está implementado en este repositorio.
 
 ## Trabajo previo / Créditos
 

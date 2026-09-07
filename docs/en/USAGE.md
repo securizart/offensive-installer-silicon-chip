@@ -2,11 +2,26 @@
 
 ## Before you start
 
-- **The MacBook Air must already have Asahi Linux/Debian installed and
-  up to date** on the internal disk (NVMe), following
-  <https://wiki.debian.org/InstallingDebianOn/Apple/M1>. This installer
+- **This installer requires deep Linux system administration
+  knowledge** (partitioning, LVM, LUKS, chroot, GRUB, APT package
+  management). It's not suitable for someone new to Linux: a
+  misunderstood step can leave the Mac unable to boot. If you're unsure
+  what any of those terms mean, learn them before continuing.
+- **The MacBook Air must already have the matching base installed and
+  up to date** on the internal disk (NVMe): Asahi Linux/Debian
+  (following <https://wiki.debian.org/InstallingDebianOn/Apple/M1>) to
+  clone toward Kali or Parrot, or Ubuntu Asahi
+  (<https://ubuntuasahi.org/>) to clone toward Ubuntu. This installer
   does not install or replace it; it assumes it's already there and
   working.
+- **Check for yourself that this Debian/Asahi base is compatible with
+  the version of Kali or Parrot you're about to install** before
+  reaching steps 08-09 (repositories and metapackages). This installer
+  does not validate that compatibility for you — check each
+  distribution's official documentation.
+- **Make as many backups of your macOS as necessary** before starting
+  (Time Machine and, if possible, a full disk clone), and verify
+  they're restorable before touching anything.
 - You need an **external USB disk**. It can host more than one
   operating system (e.g. Kali and Parrot at once), each in its own
   partitions. Note its size so you can tell it apart from the internal
@@ -74,6 +89,10 @@ with:
     Reboots when done.
 11. **Reboot and pick Kali's entry** from the GRUB boot menu (not the
     normal Debian/Asahi entry).
+
+    > If the boot hangs or drops to a `u-boot` prompt because the
+    > firmware doesn't detect the external disk, see
+    > [docs/en/TROUBLESHOOTING.md#the-firmware-doesnt-detect-the-external-disk-at-boot](TROUBLESHOOTING.md#the-firmware-doesnt-detect-the-external-disk-at-boot).
 12. **08 · Kali repositories** — already booted into the cloned system.
 13. **09 · Install Kali metapackages** — last step for Kali.
 

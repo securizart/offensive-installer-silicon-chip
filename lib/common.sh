@@ -129,3 +129,51 @@ $(t type_to_confirm "$word")" "")"
 pause_enter() {
     read -r -p "$(t press_enter_continue)" _
 }
+
+# ---------------------------------------------------------------------------
+# Instaladores de utilidades externas puntuales
+# ---------------------------------------------------------------------------
+
+# install_cast_arm64
+# Descarga e instala la última versión de "cast" (ekristen/cast, el
+# instalador de SIFT/REMnux basado en SaltStack) para arm64.
+#
+# Resuelve la versión SIN hardcodearla y SIN usar la API de GitHub (que
+# tiene un límite de peticiones/hora fácil de agotar): sigue la
+# redirección de .../releases/latest, cuya URL final ya contiene el tag
+# de la última versión (p. ej. .../releases/tag/v1.0.32). Verificado a
+# mano: es el mismo patrón que usa el propio proyecto REMnux para
+# resolver su binario de cast.
+#
+# Devuelve 0 si "cast" queda instalado y disponible en PATH, 1 en caso
+# de fallo (sin abortar el script llamador gracias a `set -e`: se debe
+# invocar como `install_cast_arm64 || ...`).
+install_cast_arm64() {
+    local ver url tmp
+    ver="$(curl -fsSL -o /dev/null -w '%{url_effective}' \
+        https://github.com/ekristen/cast/releases/latest 2>/dev/null \
+        | sed 's#.*/tag/##' || true)"
+    if [ -z "$ver" ]; then
+        log_error "No se ha podido resolver la última versión de cast (ekristen/cast)."
+        return 1
+    fi
+    url="https://github.com/ekristen/cast/releases/download/${ver}/cast-${ver}-linux-arm64.deb"
+    tmp="$(mktemp --suffix=.deb)"
+    log_info "Descargando cast ${ver} (arm64) desde $url"
+    if ! curl -fsSL -o "$tmp" "$url"; then
+        log_error "Fallo al descargar $url"
+        rm -f "$tmp"
+        return 1
+    fi
+    if ! dpkg -i "$tmp" >>"$MASTER_LOG" 2>&1; then
+        apt-get install -f -y >>"$MASTER_LOG" 2>&1 || true
+    fi
+    rm -f "$tmp"
+    if command -v cast >/dev/null 2>&1; then
+        log_ok "cast ${ver} instalado correctamente."
+        return 0
+    else
+        log_error "cast no quedó disponible en PATH tras el intento de instalación."
+        return 1
+    fi
+}

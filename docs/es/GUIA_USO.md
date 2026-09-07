@@ -2,10 +2,25 @@
 
 ## Antes de empezar
 
-- **El MacBook Air debe tener ya instalada y actualizada Asahi
-  Linux/Debian** en el disco interno (NVMe), siguiendo
-  <https://wiki.debian.org/InstallingDebianOn/Apple/M1>. Este instalador
+- **Este instalador requiere conocimientos profundos de administración
+  de sistemas Linux** (particionado, LVM, LUKS, chroot, GRUB, gestión de
+  paquetes APT). No es apto para quien se inicia en Linux: un paso mal
+  entendido puede dejar el Mac sin arrancar. Si dudas del significado de
+  cualquiera de esos términos, fórmate antes de continuar.
+- **El MacBook Air debe tener ya instalada y actualizada la base
+  correspondiente** en el disco interno (NVMe): Asahi Linux/Debian
+  (siguiendo <https://wiki.debian.org/InstallingDebianOn/Apple/M1>)
+  para clonar hacia Kali o Parrot, o Ubuntu Asahi
+  (<https://ubuntuasahi.org/>) para clonar hacia Ubuntu. Este instalador
   no la instala ni la sustituye; parte de que ya está ahí y funciona.
+- **Comprueba tú mismo que esa base Debian/Asahi es compatible con la
+  versión de Kali o Parrot que vas a instalar** antes de llegar a los
+  pasos 08-09 (repositorios y metapaquetes). Este instalador no valida
+  esa compatibilidad por ti — revisa la documentación oficial de cada
+  distribución.
+- **Haz tantas copias de seguridad de tu macOS como sean necesarias**
+  antes de empezar (Time Machine y, si es posible, un clon completo del
+  disco), y verifica que son restaurables antes de tocar nada.
 - Necesitas un **disco USB externo**. Puede alojar más de un sistema
   operativo (Kali y Parrot a la vez, por ejemplo), cada uno en sus
   propias particiones. Anota su tamaño para diferenciarlo del NVMe
@@ -69,6 +84,10 @@ Verás un menú (whiptail si ya está instalado, texto plano si no) con:
     host. Al terminar reinicia.
 11. **Reinicia y elige la entrada de Kali** en el menú de arranque de
     GRUB (no la entrada normal de Debian/Asahi).
+
+    > Si el arranque se queda colgado o cae a un prompt de `u-boot`
+    > porque el firmware no detecta el disco externo, ver
+    > [docs/es/TROUBLESHOOTING.md#el-firmware-no-detecta-el-disco-externo-al-arrancar](TROUBLESHOOTING.md#el-firmware-no-detecta-el-disco-externo-al-arrancar).
 12. **08 · Repositorios de Kali** — ya arrancado en el sistema clonado.
 13. **09 · Instalar metapaquetes de Kali** — último paso para Kali.
 

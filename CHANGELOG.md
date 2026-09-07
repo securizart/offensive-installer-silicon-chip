@@ -3,6 +3,57 @@
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 Todas las fechas en AAAA-MM-DD.
 
+## [0.4.0] — Ubuntu como tercer sistema operativo (sin conversión)
+### Changed
+- Veredicto de REMnux suavizado de "descartado" a "en duda, investigación
+  abierta": comparación directa de `.sls` (SaltStack) con los de SIFT
+  reveló que el mecanismo central de REMnux (repo vía PPA de Launchpad,
+  `cast.sls` ya arm64-aware) no tiene el mismo bug estructural que tenía
+  SIFT antes de su soporte arm64 oficial, aunque persiste un riesgo de
+  categoría distinta (herramientas dependientes de Wine, binarios de
+  terceros solo-amd64 como PolarProxy). Añadido a la hoja de ruta de
+  ambos README como investigación planeada para una próxima versión
+  (`cast install --mode=addon` con subconjunto sin Wine). Documentado
+  con detalle en `docs/{es,en}/SISTEMAS_OPERATIVOS.md`/
+  `OPERATING_SYSTEMS.md`.
+### Added
+- `ubuntu` añadido a `SUPPORTED_OS` (`lib/os_catalog.sh`): a diferencia
+  de Kali/Parrot, no se convierte, se **clona tal cual** desde una
+  instalación de Ubuntu/Asahi genuina y separada en el disco interno.
+- Nuevo mapeo `OS_SOURCE_BASE` y función **bloqueante**
+  `verify_source_base "$TARGET_OS"`: comprueba, leyendo
+  `/etc/os-release`, que el sistema arrancado coincide con la base que
+  necesita el SO activo (Debian/Asahi para Kali/Parrot, Ubuntu/Asahi
+  para Ubuntu) antes de particionar (02), formatear (03) y clonar (04).
+- `steps/08_repositorios.sh`, rama `ubuntu)`: sin repos que añadir, solo
+  `apt update && apt full-upgrade`.
+- `steps/09_instalacion_paquetes.sh`, rama `ubuntu)`: instalación
+  idempotente de `ubuntu-desktop`, y instalación **opcional**
+  (confirmación explícita) de **SIFT Workstation (SANS)** — soporte
+  arm64 oficial confirmado en Ubuntu 22.04/24.04 directamente por el
+  proyecto `teamdfir/sift-saltstack`.
+- `lib/common.sh`, función `install_cast_arm64`: descarga e instala la
+  última versión de `cast` (ekristen/cast, instalador de SIFT) para
+  arm64, resolviendo la versión sin hardcodearla y sin usar la API de
+  GitHub (límite de peticiones/hora), siguiendo en su lugar la
+  redirección de `.../releases/latest`. Probado de extremo a extremo
+  (descarga real verificada, arquitectura del `.deb` confirmada).
+- Documentación (`docs/{es,en}/SISTEMAS_OPERATIVOS.md`/
+  `OPERATING_SYSTEMS.md`, `ARQUITECTURA.md`/`ARCHITECTURE.md`,
+  `TROUBLESHOOTING.md`): veredicto final de las tres herramientas
+  forenses investigadas para Ubuntu — SIFT integrado (arm64 oficial),
+  REMnux descartado (sin soporte ARM según su propia documentación,
+  confirmado en vivo), CAINE descartado (no es un modelo de repositorio
+  convertible). Añadido también el método general para comprobar
+  disponibilidad de un paquete en arm64 (`apt-cache policy`, `rmadison`,
+  búsquedas por arquitectura en Debian/Ubuntu/Launchpad).
+- Requisito de base de origen actualizado en ambos README y en la guía
+  de uso: ahora depende del sistema destino (Debian/Asahi para
+  Kali/Parrot, Ubuntu Asahi para Ubuntu).
+### Changed
+- Hoja de ruta de ambos README actualizada: Ubuntu pasa de "planeado"
+  a "implementado".
+
 ## [Unreleased]
 ### Added
 - `README.en.md` y `CONTRIBUTING.en.md`: versión en inglés de los dos

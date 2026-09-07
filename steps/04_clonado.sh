@@ -26,6 +26,11 @@ if [ -z "$TARGET_OS" ] || [ -z "$PART_ROOT" ]; then
     exit 1
 fi
 
+# Comprobación más importante de todo el flujo: este paso copia
+# literalmente "/" al disco externo. Verificar aquí, justo antes de
+# tocar nada, que lo que está arrancado es de verdad la base correcta.
+verify_source_base "$TARGET_OS"
+
 echo "$(t step04_title "$(t "os_${TARGET_OS}_name")")"
 echo "$(t step04_intro)"
 echo

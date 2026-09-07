@@ -161,15 +161,44 @@ entrada nativa completa, con los parámetros de kernel correctos.
 Comprueba el menú de arranque después de añadir un segundo sistema para
 confirmar que ambas entradas siguen presentes.
 
+## Verificación de base de origen (Kali/Parrot vs. Ubuntu)
+
+Kali y Parrot se obtienen **convirtiendo** una base Debian/Asahi ya
+clonada (añadiendo su repositorio encima, pasos 08-09). Ubuntu es
+distinto: se **clona tal cual** desde una instalación de Ubuntu/Asahi
+genuina y separada, sin conversión posible ni con sentido. Esto
+introduce una dependencia que no existía cuando solo había un tipo de
+origen: **qué sistema tiene que estar arrancado en el disco interno**
+depende de qué `$TARGET_OS` se esté procesando.
+
+`lib/os_catalog.sh` mantiene el mapeo:
+
+```bash
+declare -A OS_SOURCE_BASE=(
+    [kali]="debian"
+    [parrot]="debian"
+    [ubuntu]="ubuntu"
+)
+```
+
+y la función `verify_source_base "$TARGET_OS"` lee `ID=` de
+`/etc/os-release` del sistema arrancado y lo compara con la base
+esperada. Es una comprobación **bloqueante a propósito** (no un simple
+aviso descartable): se invoca al principio de los pasos 02, 03 y 04
+(justo antes de particionar, formatear y clonar), porque un origen
+equivocado en el paso 04 significaría copiar literalmente el sistema
+equivocado hacia particiones ya destructivas — no hay margen para un
+"continuar de todos modos" seguro ahí.
+
 ## Módulos (`lib/`)
 
 | Fichero | Responsabilidad |
 |---|---|
 | `state.sh` | Persistencia de progreso e idioma. Funciones globales (`state_get/set`, `mark_step_done`, `step_status`) para los pasos de host, y namespaceadas por SO (`os_state_get/set`, `mark_os_step_done`, `os_step_status`, `os_list_add/get`) para los pasos 02-09. `sync_state_to_mount` copia el estado al disco externo montado. |
-| `os_catalog.sh` | Lista de sistemas operativos soportados (`SUPPORTED_OS`) y funciones que derivan nombres de partición/VG/mapper/mountpoint a partir del id del SO. Punto único para añadir un sistema operativo nuevo (ver `docs/es/SISTEMAS_OPERATIVOS.md`). |
+| `os_catalog.sh` | Lista de sistemas operativos soportados (`SUPPORTED_OS`) y funciones que derivan nombres de partición/VG/mapper/mountpoint a partir del id del SO. Incluye `OS_SOURCE_BASE` y `verify_source_base` (ver sección anterior). Punto único para añadir un sistema operativo nuevo (ver `docs/es/SISTEMAS_OPERATIVOS.md`). |
 | `i18n.sh` | Motor de traducción. `i18n_load <es\|en>` carga `i18n/strings.<lang>.sh` en el array asociativo `STRINGS[]`. `t clave arg...` traduce e interpola con `printf`. |
 | `ui.sh` | Abstracción de interfaz: `ui_msgbox`, `ui_yesno`, `ui_inputbox`, `ui_passwordbox`, `ui_menu`. Detecta si `whiptail` está instalado y cae a `read`/`echo` si no (ver más abajo). |
-| `common.sh` | `set -e -u -o pipefail` + `trap ERR`, logging (`log_info/warn/error/ok`, `init_step_log`, `run_cmd`), `require_root`, `confirm_yes_no`, `confirm_destructive`, `pause_enter`. |
+| `common.sh` | `set -e -u -o pipefail` + `trap ERR`, logging (`log_info/warn/error/ok`, `init_step_log`, `run_cmd`), `require_root`, `confirm_yes_no`, `confirm_destructive`, `pause_enter`. `install_cast_arm64` (instalador puntual de `cast`/ekristen para SIFT en Ubuntu, resolviendo la última versión sin la API de GitHub). |
 
 ## Whiptail: cuándo se usa y cuándo no
 

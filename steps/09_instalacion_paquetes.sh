@@ -35,6 +35,40 @@ case "$TARGET_OS" in
         run_cmd "parrot-core" apt-get install -y parrot-core -t lts
         run_cmd "parrot-tools-full" apt-get install -y parrot-tools-full -t lts
         ;;
+    ubuntu)
+        # 1) Entorno de escritorio, de forma idempotente: la imagen de
+        #    Ubuntu Asahi ya suele venir con escritorio, pero si el clon
+        #    viene de una base servidor/mínima, lo completamos aquí.
+        if dpkg -l ubuntu-desktop 2>/dev/null | grep -q '^ii'; then
+            log_info "ubuntu-desktop ya está instalado, se omite."
+            echo "$(t step09_ubuntu_desktop_already)"
+        else
+            echo "$(t step09_installing "ubuntu-desktop")"
+            run_cmd "apt update" apt update
+            run_cmd "ubuntu-desktop" apt-get install -y ubuntu-desktop
+        fi
+
+        # 2) SIFT Workstation (SANS), opcional: soporte arm64 oficial
+        #    confirmado en Ubuntu 22.04/24.04 por el propio proyecto
+        #    (teamdfir/sift-saltstack), con un aviso conocido: algunos
+        #    paquetes son amd64-only y se omiten automáticamente en arm64.
+        echo
+        if confirm_yes_no "$(t step09_ubuntu_ask_sift)"; then
+            echo "$(t step09_ubuntu_sift_notice)"
+            install_cast_arm64 || {
+                log_error "No se pudo instalar 'cast'. Se omite la instalación de SIFT."
+                echo "$(t step09_ubuntu_cast_install_failed)"
+            }
+            if command -v cast >/dev/null 2>&1; then
+                echo "$(t step09_ubuntu_installing_sift)"
+                run_cmd "cast install sift" cast install teamdfir/sift-saltstack
+                echo "$(t step09_ubuntu_sift_done)"
+            fi
+        else
+            log_info "Instalación de SIFT omitida por el usuario."
+            echo "$(t step09_ubuntu_sift_skipped)"
+        fi
+        ;;
     *)
         log_error "Sistema operativo desconocido: $TARGET_OS"
         exit 1

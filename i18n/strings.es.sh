@@ -55,6 +55,14 @@ STRINGS[os_kali_name]="Kali Linux"
 STRINGS[os_kali_desc]="Distribución de pentesting basada en Debian, con soporte arm64 oficial (kali-rolling)."
 STRINGS[os_parrot_name]="Parrot OS"
 STRINGS[os_parrot_desc]="Distribución de pentesting/privacidad basada en Debian, con repositorio oficial arm64 (deb.parrot.sh)."
+STRINGS[os_ubuntu_name]="Ubuntu"
+STRINGS[os_ubuntu_desc]="Se clona tal cual desde una instalación de Ubuntu/Asahi genuina en el disco interno (sin conversión: no hay repositorio 'Ubuntu' que añadir sobre otra base)."
+
+# --- verificación de base de origen -----------------------------------------
+STRINGS[source_base_debian_name]="Debian/Asahi"
+STRINGS[source_base_ubuntu_name]="Ubuntu/Asahi"
+STRINGS[source_base_cannot_detect]="No se ha podido leer /etc/os-release para comprobar qué sistema está arrancado. No se puede continuar de forma segura."
+STRINGS[source_base_mismatch]="⚠ Sistema operativo activo: %s. Este sistema necesita clonarse desde una base %s arrancada en el disco interno, pero el sistema actualmente arrancado tiene ID='%s' en /etc/os-release, que no coincide.\n\nReinicia el Mac y elige la entrada de arranque interna correcta antes de continuar con este paso."
 
 # --- paso 00: comprobación de prerrequisitos ------------------------------
 STRINGS[step00_title]="00 · Comprobar requisitos previos y elegir disco destino"
@@ -152,6 +160,7 @@ STRINGS[step08_adding_repos]="Añadiendo repositorios y actualizando el pinning.
 STRINGS[step08_updating]="Actualizando el sistema con los nuevos repositorios (dist-upgrade)..."
 STRINGS[step08_done_reboot]="Repositorios añadidos y sistema actualizado. El sistema se reiniciará ahora."
 STRINGS[step08_parrot_arm_notice]="Nota: el soporte arm64 de Parrot OS es menos maduro y probado que el de Kali. Si algún metapaquete falla, revisa el log e instala herramientas sueltas según necesites."
+STRINGS[step08_ubuntu_no_repos]="Ubuntu no necesita repositorios adicionales: el clon ya es un Ubuntu genuino. Solo lo actualizamos."
 
 # --- paso 09: instalación final de metapaquetes (por SO) ----------------------
 STRINGS[step09_title_short]="09 · Instalar metapaquetes"
@@ -160,3 +169,10 @@ STRINGS[step09_intro]="Último paso: instalar los metapaquetes de %s."
 STRINGS[step09_installing]="Instalando: %s..."
 STRINGS[step09_done_reboot]="Instalación completada. El sistema se reiniciará ahora."
 STRINGS[step09_all_done]="🎉 Instalación de %s completa. Al reiniciar, deberías poder elegirlo desde el menú de arranque."
+STRINGS[step09_ubuntu_desktop_already]="El entorno de escritorio (ubuntu-desktop) ya estaba instalado, se omite."
+STRINGS[step09_ubuntu_ask_sift]="¿Quieres instalar también SIFT Workstation (SANS), el conjunto de herramientas forenses, sobre este Ubuntu? Es opcional."
+STRINGS[step09_ubuntu_sift_notice]="SIFT tiene soporte arm64 oficial en Ubuntu 22.04/24.04 (proyecto teamdfir/sift-saltstack), con un aviso conocido de sus propios mantenedores: algunos paquetes son solo para amd64 y se omiten automáticamente en arm64, sin que eso interrumpa el resto de la instalación."
+STRINGS[step09_ubuntu_cast_install_failed]="No se ha podido instalar 'cast' (comprueba la conexión a internet). SIFT no se ha instalado."
+STRINGS[step09_ubuntu_installing_sift]="Instalando SIFT Workstation con cast (puede tardar bastante)..."
+STRINGS[step09_ubuntu_sift_done]="SIFT Workstation instalado. Revisa el log de este paso para ver si algún paquete se omitió por ser amd64-only."
+STRINGS[step09_ubuntu_sift_skipped]="Instalación de SIFT omitida."

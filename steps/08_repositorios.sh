@@ -76,6 +76,16 @@ EOF
         echo "$(t step08_parrot_arm_notice)"
         ;;
 
+    ubuntu)
+        # Sin conversión: el clon ya ES Ubuntu genuino. Solo lo dejamos al
+        # día tras el rsync del paso 04 (que pudo copiar paquetes con
+        # versiones ligeramente desfasadas si hubo actualizaciones de por
+        # medio entre el arranque de origen y este momento).
+        echo "$(t step08_ubuntu_no_repos)"
+        run_cmd "apt update" apt update
+        run_cmd "apt full-upgrade ubuntu" apt full-upgrade -y
+        ;;
+
     *)
         log_error "Sistema operativo desconocido: $TARGET_OS"
         exit 1

@@ -24,6 +24,8 @@ if [ -z "$TARGET_OS" ] || [ -z "$PART_ROOT" ] || [ ! -b "${TARGET_DISK}${PART_EF
     exit 1
 fi
 
+verify_source_base "$TARGET_OS"
+
 VG="$(os_vg_name "$TARGET_OS")"
 CRYPTNAME="$(os_crypt_name "$TARGET_OS")"
 ROOT_LABEL="$(os_root_label "$TARGET_OS")"

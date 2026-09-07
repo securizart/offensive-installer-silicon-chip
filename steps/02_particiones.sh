@@ -30,6 +30,12 @@ if [ -z "$TARGET_DISK" ] || [ ! -b "$TARGET_DISK" ]; then
     exit 1
 fi
 
+# Verificación bloqueante: el sistema arrancado ahora mismo tiene que ser
+# la base de origen correcta para $TARGET_OS (p. ej. Debian/Asahi para
+# Kali/Parrot, Ubuntu/Asahi para Ubuntu). Si no coincide, para aquí antes
+# de particionar nada.
+verify_source_base "$TARGET_OS"
+
 echo "$(t step02_title "$(t "os_${TARGET_OS}_name")")"
 echo "$(t step02_intro "$TARGET_DISK" "$(t "os_${TARGET_OS}_name")")"
 echo

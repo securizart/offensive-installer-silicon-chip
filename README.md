@@ -3,7 +3,7 @@
 **[Read this in English → README.en.md](README.en.md)**
 
 Instalador con menú, multiidioma (ES/EN) y soporte para **varios
-sistemas operativos ofensivos** (Kali Linux, Parrot Security OS) en un
+sistemas operativos ofensivos** (Kali Linux, Parrot Security OS y Ubuntu) en un
 disco externo USB con particiones cifradas, clonados a partir de una
 base **Debian/Asahi** ya instalada en un MacBook Air/Pro Apple Silicon
 (M1/M2). El `/boot` (EFI + kernel) se mantiene en el disco interno del
@@ -21,12 +21,21 @@ Debian/Asahi (NVMe interno, ya instalado) ──clona──▶ disco externo USB
 
 ## Requisito indispensable antes de usar esto
 
-**El MacBook debe tener ya instalado y actualizado el sistema operativo
-base Asahi Linux / Debian** en su disco interno (NVMe), antes de
-ejecutar nada de este repositorio. Este proyecto **no instala macOS ni
-Asahi/Debian**: parte de que esa base ya existe y funciona, y clona ese
-sistema en marcha hacia un disco externo para convertirlo en Kali y/o
-Parrot.
+**El MacBook debe tener ya instalado y actualizado, en su disco interno
+(NVMe), el sistema operativo base que corresponda al destino que
+quieras clonar**, antes de ejecutar nada de este repositorio:
+
+- **Asahi Linux / Debian** — para clonar hacia **Kali** o **Parrot**
+  (se convierten añadiendo su repositorio sobre esta base).
+- **Ubuntu Asahi** — para clonar hacia **Ubuntu** (se clona tal cual,
+  sin conversión; ver [ubuntuasahi.org](https://ubuntuasahi.org/)).
+
+Este proyecto **no instala macOS ni ninguna de estas bases**: parte de
+que ya existen y funcionan, y clona la que corresponda hacia un disco
+externo. El instalador comprueba automáticamente, antes de particionar
+o clonar, que el sistema arrancado coincide con el que necesita el
+destino elegido (ver
+[docs/es/SISTEMAS_OPERATIVOS.md](docs/es/SISTEMAS_OPERATIVOS.md)).
 
 Sigue la guía oficial si todavía no la tienes:
 <https://wiki.debian.org/InstallingDebianOn/Apple/M1> (proyecto Bananas
@@ -43,11 +52,14 @@ sueltas y bastante prueba-error manual:
 
 - Comprueba los prerrequisitos y particiona, cifra (LUKS) y formatea un
   **disco externo USB**.
-- **Clona** el sistema Debian/Asahi en marcha a ese disco externo.
+- **Clona** el sistema en marcha (Debian/Asahi o Ubuntu/Asahi, según el
+  destino elegido) a ese disco externo.
 - Añade los repositorios y metapaquetes de **Kali Linux** y/o **Parrot
   Security OS** sobre esa base clonada, usando los mecanismos oficiales
   de cada distribución, convirtiéndola en una distribución de pentesting
   completa arrancable desde el menú de GRUB junto al sistema original.
+  **Ubuntu**, en cambio, se clona tal cual (sin conversión), con la
+  opción de añadir encima **SIFT Workstation (SANS)** para forense.
 - Permite instalar **más de un sistema ofensivo en el mismo disco
   externo**, cada uno en sus propias particiones, sin pisar los datos de
   los demás.
@@ -197,14 +209,29 @@ hoja de ruta más abajo.
 
 ## Hoja de ruta
 
-- **Ubuntu como tercer sistema operativo instalable**: se está
-  preparando una segunda versión del instalador que añada Ubuntu al
-  catálogo (`lib/os_catalog.sh`), siguiendo el mismo patrón que Kali y
-  Parrot. El objetivo, además de ofrecerlo como opción propia, es usarlo
-  para **mejorar la integración de Parrot OS**, cuyo soporte arm64 es
-  oficial pero menos maduro que el de Kali (ver
-  [docs/es/SISTEMAS_OPERATIVOS.md](docs/es/SISTEMAS_OPERATIVOS.md)).
-  Todavía no está implementado en este repositorio.
+- ~~Ubuntu como tercer sistema operativo instalable~~ — **implementado**:
+  `ubuntu` ya está en el catálogo (`lib/os_catalog.sh`), clonado tal
+  cual desde una instalación de Ubuntu/Asahi genuina (sin conversión,
+  a diferencia de Kali/Parrot). Incluye instalación idempotente de
+  `ubuntu-desktop` y, como opción, **SIFT Workstation (SANS)** — soporte
+  arm64 oficial confirmado en Ubuntu 22.04/24.04. Ver
+  [docs/es/SISTEMAS_OPERATIVOS.md](docs/es/SISTEMAS_OPERATIVOS.md) para
+  el detalle completo, incluido por qué se descartaron CAINE y REMnux.
+- Próximo: seguir puliendo la integración de Parrot OS (su soporte
+  arm64 sigue siendo menos maduro que el de Kali) y evaluar más
+  herramientas forenses sobre la base Ubuntu ya disponible.
+- **REMnux, en investigación (no descartado del todo)**: una
+  comparación directa de sus `.sls` con los de SIFT (que sí tiene
+  soporte arm64 oficial) muestra que el mecanismo central de REMnux
+  (repo vía PPA de Launchpad, bootstrap de `cast` ya arm64-aware) no
+  tiene el mismo problema estructural que había en SIFT, pero sí una
+  categoría de riesgo distinta: herramientas dependientes de Wine
+  (soporte arm64 inmaduro) y binarios de terceros publicados solo en
+  amd64 (p. ej. PolarProxy). Plan: probar `cast install --mode=addon`
+  con un subconjunto de `.sls` sin dependencias de Wine para medir qué
+  fracción real funciona, antes de decidir si se integra como opción
+  en el paso 09 (igual que SIFT) o se documenta como "no soportado".
+  Ver [docs/es/SISTEMAS_OPERATIVOS.md](docs/es/SISTEMAS_OPERATIVOS.md).
 
 ## Trabajo previo / Créditos
 

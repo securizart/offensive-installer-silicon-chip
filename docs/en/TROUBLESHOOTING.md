@@ -1,5 +1,75 @@
 # Troubleshooting — base_inst_kali
 
+## How to check if a package exists for arm64 (before adding it to a new OS)
+
+Useful whenever you're considering adding a new tool or distro to the
+catalogue (see `docs/en/OPERATING_SYSTEMS.md`), so you don't assume
+anything:
+
+**On a real Debian/Ubuntu machine** (arm64, or cross-checking from
+amd64):
+
+```bash
+sudo dpkg --add-architecture arm64
+sudo apt update
+apt-cache policy <package>:arm64
+```
+
+If "Candidate" is empty, no arm64 build exists in the configured repos.
+To catch broken dependency chains before installing anything for real:
+
+```bash
+apt-get install --simulate <package>
+```
+
+**Without touching any machine** (web lookup):
+
+| Source | Architecture search URL |
+|---|---|
+| Debian | `packages.debian.org/search?arch=arm64&keywords=PKG` |
+| Ubuntu | `packages.ubuntu.com/search?arch=arm64&keywords=PKG` |
+| PPA (Launchpad) | `launchpad.net/~USER/+archive/ubuntu/NAME` → "View package details" tab |
+
+Important: Ubuntu splits its mirror — `archive.ubuntu.com` only serves
+`amd64`/`i386`; `arm64` lives on `ports.ubuntu.com`. If a `sources.list`
+points at the former, `arm64` will never show up even if it exists on
+the latter.
+
+**`rmadison`** (from the `devscripts` package), a quick check without
+needing a local `dpkg --add-architecture`:
+
+```bash
+rmadison -a arm64 <package>                # Debian
+rmadison -u ubuntu -a arm64 <package>      # Ubuntu
+```
+
+## The firmware doesn't detect the external disk at boot
+
+On some MacBooks (seen on Air M1 and M2), after step 07, when picking
+the Kali/Parrot entry from the boot menu, the process can hang or drop
+to the `u-boot` prompt because the firmware hasn't detected the
+external USB disk in time (the USB bus isn't always ready when u-boot
+does its first scan of boot devices).
+
+If you land at the `u-boot` prompt (something like `=>`), type:
+
+```
+env set boot_efi_mgr
+run bootcmd_usb0
+```
+
+- `env set boot_efi_mgr` sets up the environment variable u-boot uses
+  for the EFI boot manager.
+- `run bootcmd_usb0` forces a new scan of the first USB controller,
+  which is usually enough for the external disk to show up so u-boot
+  can continue on to the GRUB menu normally.
+
+If this happens on every boot, try connecting the disk to a different
+port (MacBook Airs only have 2 Thunderbolt/USB-C ports and they don't
+all behave the same during early boot), or use a better-quality
+cable/adapter — this is an early bus-detection issue, not a problem
+with the partitions or the cloned system itself.
+
 ## "No active operating system"
 
 Steps 02-09 need an active OS. Go to the menu, "Operating systems"
@@ -111,3 +181,45 @@ Parrot's arm64 support is official but less mature than Kali's. Check
 `logs/paso_09_*.log` to see which specific package failed, then install
 or replace it manually afterwards (`apt install <package>`); there's no
 need to redo the whole step 09 over a single problematic package.
+
+## "⚠ Active operating system: X. This system needs to be cloned from a Y base booted..."
+
+You picked an active OS (e.g. `ubuntu`) but the system currently booted
+on the internal disk doesn't match the base that OS requires
+(`verify_source_base` in `lib/os_catalog.sh`, see
+`docs/en/ARCHITECTURE.md`). Reboot the Mac and pick the correct internal
+boot entry in the firmware:
+
+- For `kali`/`parrot`: the Debian/Asahi entry.
+- For `ubuntu`: the Ubuntu/Asahi entry.
+
+This check is intentionally blocking — the next step clones whatever is
+currently booted, so a wrong source would mean cloning the wrong system
+onto already-destructive partitions.
+
+## SIFT installation (Ubuntu, step 09) skips some packages
+
+This is expected and documented by the SIFT project itself
+(`teamdfir/sift-saltstack`): "a handful of packages are amd64-only and
+are skipped on arm64." Check `logs/paso_09_*.log` (the full output of
+`cast install teamdfir/sift-saltstack`) to see exactly which ones were
+skipped in your specific install — it can vary between SIFT versions.
+This isn't a failure of the installer or of `install_cast_arm64`; it's
+a known, accepted upstream limitation.
+
+## `install_cast_arm64` fails to install `cast` (SIFT, Ubuntu)
+
+Check the internet connection on the already-booted Ubuntu. The
+function (`lib/common.sh`) resolves the latest version of
+[ekristen/cast](https://github.com/ekristen/cast) by following the
+`.../releases/latest` redirect (avoiding the GitHub API, which has an
+easily-exhausted rate limit); if GitHub isn't reachable, it will fail
+there without interrupting the rest of the install. You can test it by
+hand:
+
+```bash
+curl -fsSL -o /dev/null -w '%{url_effective}\n' https://github.com/ekristen/cast/releases/latest
+```
+
+If this doesn't return a URL with `/releases/tag/vX.Y.Z`, the problem
+is network/DNS/firewall related, not the script.

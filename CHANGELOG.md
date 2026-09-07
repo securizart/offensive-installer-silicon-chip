@@ -3,6 +3,16 @@
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 Todas las fechas en AAAA-MM-DD.
 
+## [Unreleased]
+### Planned
+- Cobertura explícita de "distros forenses" como eje de la próxima
+  versión (no solo herramientas sueltas sobre Ubuntu): rematar la
+  investigación de REMnux y evaluar otras distros de referencia
+  (Tsurugi Linux, DEFT/DEFT Zero) con la misma metodología de
+  comprobación real de arm64, documentando un veredicto explícito para
+  cada una en `docs/{es,en}/SISTEMAS_OPERATIVOS.md`/
+  `OPERATING_SYSTEMS.md`. Anotado en la hoja de ruta de ambos README.
+
 ## [0.4.0] — Ubuntu como tercer sistema operativo (sin conversión)
 ### Changed
 - Veredicto de REMnux suavizado de "descartado" a "en duda, investigación

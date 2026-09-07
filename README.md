@@ -67,6 +67,38 @@ sueltas y bastante prueba-error manual:
   persistente (sobrevive a los múltiples reinicios que exige el
   proceso), **logging** por paso, y textos en **castellano e inglés**.
 
+## Diagrama de decisión: qué sistema operativo elegir
+
+```mermaid
+flowchart TD
+    A["¿Qué quieres tener en el disco externo?"] --> B{"Elige SO destino<br/>(menú → Sistemas operativos)"}
+
+    B -->|Kali| C["Requiere <b>Debian/Asahi</b><br/>arrancado en el disco interno"]
+    B -->|Parrot| C
+    B -->|Ubuntu| D["Requiere <b>Ubuntu/Asahi</b><br/>arrancado en el disco interno"]
+
+    C --> E["verify_source_base bloquea<br/>si el origen no coincide"]
+    D --> E
+
+    E -->|Kali/Parrot| F["Pasos 02-07:<br/>particionar + LUKS + clonar + chroot"]
+    E -->|Ubuntu| F
+
+    F -->|Kali/Parrot| G["Paso 08-09:<br/><b>CONVERTIR</b> — añadir repo<br/>kali-rolling / parrot lts<br/>+ metapaquetes"]
+    F -->|Ubuntu| H["Paso 08-09:<br/>sin conversión, solo<br/>apt update/upgrade<br/>+ ubuntu-desktop (idempotente)"]
+
+    H --> I{"¿Instalar también<br/>SIFT Workstation (SANS)?<br/>(opcional, confirmación explícita)"}
+    I -->|Sí| J["install_cast_arm64 +<br/>cast install teamdfir/sift-saltstack<br/>arm64 oficial en Ubuntu 22.04/24.04"]
+    I -->|No| K["Ubuntu limpio, sin<br/>herramientas forenses extra"]
+
+    G --> Z["Sistema listo,<br/>arrancable desde el menú de GRUB"]
+    J --> Z
+    K --> Z
+```
+
+> Herramientas forenses evaluadas para Ubuntu más allá de SIFT (CAINE,
+> REMnux) tienen su propio veredicto detallado en
+> [docs/es/SISTEMAS_OPERATIVOS.md](docs/es/SISTEMAS_OPERATIVOS.md#herramientas-forenses-investigadas-para-ubuntu-veredicto).
+
 ## Requisitos
 
 - MacBook con chip Apple M1 o M2, con Asahi Linux/Debian ya instalado y
@@ -197,8 +229,6 @@ repositorio.
 
 ## Demo en vídeo
 
-## Demo en vídeo
-
 [![Demo: instalación de Kali, Parrot y Ubuntu sobre Debian/Asahi en Apple Silicon](https://img.youtube.com/vi/JsPsCAa4XBU/hqdefault.jpg)](https://youtu.be/JsPsCAa4XBU)
 
 ▶️ **[Ver en YouTube](https://youtu.be/JsPsCAa4XBU)**
@@ -209,6 +239,15 @@ hoja de ruta más abajo.
 
 ## Hoja de ruta
 
+- **Próxima versión: cobertura explícita de "distros forenses"**, no
+  solo herramientas sueltas sobre Ubuntu. Además de rematar la
+  investigación de REMnux (ver más abajo), evaluar con la misma
+  metodología (comprobación real de disponibilidad arm64, no dar nada
+  por hecho) otras distribuciones forenses de referencia — p. ej.
+  Tsurugi Linux, DEFT/DEFT Zero — y documentar en
+  `docs/es/SISTEMAS_OPERATIVOS.md` un veredicto explícito para cada una
+  (soportada, en duda, o descartada y por qué), siguiendo el mismo
+  formato ya usado con CAINE/SIFT/REMnux.
 - ~~Ubuntu como tercer sistema operativo instalable~~ — **implementado**:
   `ubuntu` ya está en el catálogo (`lib/os_catalog.sh`), clonado tal
   cual desde una instalación de Ubuntu/Asahi genuina (sin conversión,

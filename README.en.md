@@ -71,6 +71,38 @@ trial-and-error:
   progress (survives the multiple reboots the process requires),
   per-step **logging**, and text in **Spanish and English**.
 
+## Decision diagram: which operating system to choose
+
+```mermaid
+flowchart TD
+    A["What do you want on the external disk?"] --> B{"Pick target OS<br/>(menu → Operating systems)"}
+
+    B -->|Kali| C["Requires <b>Debian/Asahi</b><br/>booted on the internal disk"]
+    B -->|Parrot| C
+    B -->|Ubuntu| D["Requires <b>Ubuntu/Asahi</b><br/>booted on the internal disk"]
+
+    C --> E["verify_source_base blocks<br/>if the source doesn't match"]
+    D --> E
+
+    E -->|Kali/Parrot| F["Steps 02-07:<br/>partition + LUKS + clone + chroot"]
+    E -->|Ubuntu| F
+
+    F -->|Kali/Parrot| G["Steps 08-09:<br/><b>CONVERT</b> — add repo<br/>kali-rolling / parrot lts<br/>+ metapackages"]
+    F -->|Ubuntu| H["Steps 08-09:<br/>no conversion, just<br/>apt update/upgrade<br/>+ ubuntu-desktop (idempotent)"]
+
+    H --> I{"Also install<br/>SIFT Workstation (SANS)?<br/>(optional, explicit confirmation)"}
+    I -->|Yes| J["install_cast_arm64 +<br/>cast install teamdfir/sift-saltstack<br/>official arm64 on Ubuntu 22.04/24.04"]
+    I -->|No| K["Plain Ubuntu, no<br/>extra forensic tools"]
+
+    G --> Z["System ready,<br/>bootable from the GRUB menu"]
+    J --> Z
+    K --> Z
+```
+
+> Forensic tools evaluated for Ubuntu beyond SIFT (CAINE, REMnux) have
+> their own detailed verdict in
+> [docs/en/OPERATING_SYSTEMS.md](docs/en/OPERATING_SYSTEMS.md#forensic-tools-investigated-for-ubuntu-verdict).
+
 ## Requirements
 
 - MacBook with an Apple M1 or M2 chip, with Asahi Linux/Debian already
@@ -206,6 +238,14 @@ this same base, as a proof of concept — see the roadmap below.
 
 ## Roadmap
 
+- **Next version: explicit "forensic distros" coverage**, not just
+  standalone tools on top of Ubuntu. Besides wrapping up the REMnux
+  investigation (see below), evaluate other reference forensic
+  distributions with the same methodology (checking real arm64
+  availability, never assuming) — e.g. Tsurugi Linux, DEFT/DEFT Zero —
+  and document an explicit verdict for each in
+  `docs/en/OPERATING_SYSTEMS.md` (supported, in doubt, or discarded and
+  why), following the same format already used for CAINE/SIFT/REMnux.
 - ~~Ubuntu as a third installable operating system~~ — **implemented**:
   `ubuntu` is now in the catalogue (`lib/os_catalog.sh`), cloned as-is
   from a genuine Ubuntu/Asahi installation (no conversion, unlike
